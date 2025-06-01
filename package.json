@@ -1,0 +1,12 @@
+{
+  "name": "api-rate-limiter",
+  "version": "1.0.0",
+  "description": "A Node.js Express API rate limiting implementation with MongoDB for tracking request limits and usage. This project manages API access through API keys, enforces configurable request limits, provides usage statistics, and includes automatic blacklisting for users who repeatedly exceed their limits.",
+  "license": "ISC",
+  "author": "Shashank Krishnaprasad",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
