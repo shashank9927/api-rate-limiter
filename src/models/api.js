@@ -47,4 +47,4 @@ const apiKeySchema = new mongoose.Schema({
 
 const rateLimitModel = mongoose.model('ApiKey',apiKeySchema)
 
-module.exports = {rateLimitModel}
+module.exports = rateLimitModel
