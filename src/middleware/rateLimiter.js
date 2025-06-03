@@ -1,4 +1,4 @@
-const rateLimitModel = require('./models/api.js');
+const rateLimitModel = require('../models/api.js');
 const mongoose = require('mongoose');
 const { checkAndFixBlacklist } = require('../utils/blackListHelper.js');
 

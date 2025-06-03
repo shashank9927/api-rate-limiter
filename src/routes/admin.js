@@ -1,5 +1,5 @@
 const express = require('express');
-const ApiKey = require('../models/apiKey');
+const rateLimitModel = require('../models/api.js');
 const { cleanupExpiredBlacklists } = require('../utils/blacklistCleanup');
 const { checkAndFixBlacklist } = require('../utils/blackListHelper');
 

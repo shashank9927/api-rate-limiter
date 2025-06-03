@@ -1,8 +1,8 @@
 const express = require('express');
-const ApiKey = require('../models/apiKey');
-const rateLimiter = require('../middleware/rateLimiter');
-const { generateApiKey } = require('../utils/apiKeyGenerator');
-const { checkAndFixBlacklist } = require('../utils/blackListHelper');
+const rateLimitModel = require('../models/api.js');
+const rateLimiter = require('../middleware/rateLimiter.js');
+const { generateApiKey } = require('../utils/apiKeyGenerator.js');
+const { checkAndFixBlacklist } = require('../utils/blackListHelper.js');
 
 const router = express.Router();
 
