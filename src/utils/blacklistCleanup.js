@@ -21,9 +21,7 @@ const cleanupExpiredBlacklists = async () => {
         // Only perform the update if there are expired keys
         if (expiredCount === 0) {
             return 0;
-        }
-
-        //update all API Keys with expired blacklists in a single operation
+        }        //update all API Keys with expired blacklists in a single operation
         const result = await rateLimitModel.updateMany(
             {
                 isBlacklisted: true,
