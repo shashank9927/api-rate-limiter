@@ -221,5 +221,5 @@ router.post('/admin/cleanup-blacklists', async(req,res)=>{
     }
 });
 
-module.exports = router;
+module.exports = {router};
 
