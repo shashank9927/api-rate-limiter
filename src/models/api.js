@@ -12,7 +12,7 @@ const apiKeySchema = new mongoose.Schema({
         required: true,
     },
     limits: {
-        requestPerMinute: {
+        requestsPerMinute: {
             type: Number,
             required: true,
             default: 60
@@ -30,11 +30,11 @@ const apiKeySchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    isBlackListed: {
+    isBlacklisted: {
         type: Boolean,
         default: false
     },
-    blackListedUntil:{
+    blacklistedUntil:{
         type: Date,
         default: null
     },
