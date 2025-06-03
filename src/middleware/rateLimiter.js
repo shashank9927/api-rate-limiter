@@ -1,5 +1,6 @@
-const rateLimitModel = require('./models/api.js')
-const mongoose = require('mongoose')
+const rateLimitModel = require('./models/api.js');
+const mongoose = require('mongoose');
+const { checkAndFixBlacklist } = require('../utils/blackListHelper.js');
 
 //check if request is within the limit for the provided API Key
 
@@ -20,7 +21,7 @@ const rateLimiter = async(req,res,next) => {
         const oneMinuteAgo = new Date(now.getTime() - windowSizeMs);
 
         //use findOne to get current state
-        const apiKeyDoc = await rateLimitModel.findOne({key: apiKey});
+        let apiKeyDoc = await rateLimitModel.findOne({key: apiKey});
 
         if(!apiKeyDoc){
             return res.status(401).json({
@@ -28,35 +29,22 @@ const rateLimiter = async(req,res,next) => {
             });
         }
 
-        //check if provided API Key is blacklisted
-        if(apiKeyDoc.isBlacklisted && apiKeyDoc.blacklistedUntil > now){
+        //check if provided API Key is blacklisted using helper function
+        const { isBlacklisted, apiKeyDoc: updatedApiKeyDoc } = await checkAndFixBlacklist(apiKey);
+        apiKeyDoc = updatedApiKeyDoc; // Use the updated document
+
+        //check if black listed and return appropriate response
+        if (isBlacklisted) {
             const remainingTimeMs = apiKeyDoc.blacklistedUntil - now;
-            const remainingTimeHours = Math.ceil(remainingTimeMs/(1000*60*60));
-
-            return res.status(403).json({
-                error: 'API Key is blacklisted due to excessive use',
-                blacklistedUntil: apiKeyDoc.blacklistedUntil,
-                remainingTimeHours: remainingTimeHours,
-                message: `Please try again after ${remainingTimeHours} hours`
-            });
+            return res.status(403).json(
+                { 
+                error: 'API key is blacklisted due to excessive use',
+                blacklistedUntil: apiKeyDoc.blacklistedUntil.toISOString(),
+                timeRemaining: `${Math.ceil(remainingTimeMs / 1000)} seconds`,
+                message: 'Please try again after the blacklist period expires'
+                }
+                );
         }
-
-        //check if blacklist period has expired and remove blacklist in needed
-        
-        if(apiKeyDoc.isBlacklisted && apiKeyDoc.blacklistedUntil <= now){
-            await rateLimitModel.updateOne({
-                key: apiKey
-            },
-            {
-               $set: {
-                isBlacklisted: false,
-                blacklistedUntil: null,
-                excessiveRequestCount: 0 // now reset excessive request counter
-               } 
-            }
-         );
-        }
-
         //check if window is expired 
 
         const windowExpired = !apiKeyDoc.windowStart || apiKeyDoc.windowStart < oneMinuteAgo;
@@ -120,7 +108,8 @@ const rateLimiter = async(req,res,next) => {
                     }
                     );
                 }
-
+                const timeRemainingMs = windowSizeMs - (now - apiKeyDoc.windowStart);
+                const resetTime = new Date(now.getTime() + timeRemainingMs);
                 //return rate limit error
                 return res.status(429).json(
                     {
@@ -128,7 +117,9 @@ const rateLimiter = async(req,res,next) => {
                         limit: apiKeyDoc.limits.requestsPerMinute,
                         requestCount: apiKeyDoc.requestCount,
                         windowStart: apiKeyDoc.windowStart,
-                        timeRemaining: windowSizeMs - (now - apiKeyDoc.windowStart)
+                        timeRemaining: Math.ceil(timeRemainingMs / 1000),
+                        resetAt: resetTime,
+                        message: 'Rate limit exceeded'
                     }
                 );
             }
@@ -156,5 +147,4 @@ const rateLimiter = async(req,res,next) => {
     }
 };
 
-module.exports = {rateLimiter};
-
+module.exports = rateLimiter;
