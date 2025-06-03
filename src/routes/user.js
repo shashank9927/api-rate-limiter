@@ -14,7 +14,7 @@ router.get('/usage', async (req, res) => {
             {
                 return res.status(401).json({ error: 'API key is required' });
             }
-        const apiKeyDoc = await ApiKey.findOne({ key: apiKey });
+        let apiKeyDoc = await rateLimitModel.findOne({ key: apiKey });
         
         if (!apiKeyDoc) 
             {
@@ -23,7 +23,8 @@ router.get('/usage', async (req, res) => {
             
         const now = new Date();
         const windowStart = new Date(apiKeyDoc.windowStart);
-        const windowSizeMs = 60 * 1000;    const timeRemainingMs = Math.max(0, windowSizeMs - (now - windowStart));
+        const windowSizeMs = 60 * 1000;    
+        const timeRemainingMs = Math.max(0, windowSizeMs - (now - windowStart));
         
         // Use the blacklist helper to check and fix if needed
         const { isBlacklisted, apiKeyDoc: updatedApiKeyDoc } = await checkAndFixBlacklist(apiKey);
@@ -56,7 +57,7 @@ router.post('/api-keys', async (req, res) => {
         const { userId, requestsPerMinute = 60 } = req.body;
         if (!userId) return res.status(400).json({ error: 'userId is required' });
         const key = generateApiKey();
-        const apiKey = new ApiKey({ key, userId, limits: { requestsPerMinute }, windowStart: new Date(), requestCount: 0 });
+        const apiKey = new rateLimitModel({ key, userId, limits: { requestsPerMinute }, windowStart: new Date(), requestCount: 0 });
         await apiKey.save();
         return res.status(201).json({ key, userId, limits: apiKey.limits });
        } 
@@ -82,9 +83,7 @@ router.get('/blacklist-status', async (req, res) => {
         if (!apiKey) 
             {
                 return res.status(401).json({ error: 'API key is required' });
-            }
-
-        const apiKeyDoc = await ApiKey.findOne({ key: apiKey });
+            }        let apiKeyDoc = await rateLimitModel.findOne({ key: apiKey });
         if (!apiKeyDoc) 
             {
                 return res.status(401).json({ error: 'Invalid API key' });
