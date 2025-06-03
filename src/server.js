@@ -41,12 +41,12 @@ app.use((req, res) => {
         apiKeys: '/user/api-keys - Generate new API key (POST)',
         protected: '/user/protected - Rate-limited endpoint',
         blacklistStatus: '/user/blacklist-status - Check if key is blacklisted'
-      },
-      adminEndpoints: {
+      },      adminEndpoints: {
         root: '/admin - Admin dashboard information',
         apiStatus: '/admin/api-status - Admin API status',
         blacklistedKeys: '/admin/blacklisted-keys - View blacklisted keys',
-        cleanupBlacklists: '/admin/cleanup-blacklists - Clean expired blacklists (POST)'
+        cleanupBlacklists: '/admin/cleanup-blacklists - Clean expired blacklists (POST)',
+        freeApiKey: '/admin/free-api-key - Remove blacklist status from specific API key (POST)'
       }
     }
   });
