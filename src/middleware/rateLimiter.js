@@ -86,9 +86,7 @@ const rateLimiter = async(req,res,next) => {
                 //check if the API Key should be blacklisted
                 if(excessiveCount >= blacklistThreshold){
                     // black list the API Key for 24 Hours
-                    const blacklistExpiration = new Date(now.getTime() + (24 * 60 * 60 * 1000 ));
-
-                    await rateLimitModel.updateOne(
+                    const blacklistExpiration = new Date(now.getTime() + (24 * 60 * 60 * 1000 ));                await rateLimitModel.updateOne(
                         {
                             key: apiKey
                         },
