@@ -12,7 +12,7 @@ const checkAndFixBlacklist = async (apiKey) => {
     
         const now = new Date();
 
-        //check if the API Key is blacklisted
+        // Use the correct field names (isBlacklisted instead of isBlackListed)
         const isBlacklisted = apiKeyDoc.isBlacklisted && apiKeyDoc.blacklistedUntil && apiKeyDoc.blacklistedUntil > now;
 
         //if marked blacklisted but date has expired, fix it immediately
@@ -33,7 +33,6 @@ const checkAndFixBlacklist = async (apiKey) => {
             );
 
             //update the document in database to reflect changes
-
             apiKeyDoc.isBlacklisted = false;
             apiKeyDoc.blacklistedUntil = null;
             apiKeyDoc.excessiveRequestCount = 0;
